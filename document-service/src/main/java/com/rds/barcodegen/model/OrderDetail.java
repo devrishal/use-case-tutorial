@@ -10,12 +10,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderDetail {
-    private CustomerInfo customerInfo;
 
-    private List<Item> items;
+	private CustomerInfo customerInfo;
 
-    private double reductionPercentage;
+	private List<Item> items;
 
-    private double totalAmount;
-    private double totalDiscount;
+	private double reductionPercentage;
+
+	private double totalAmount;
+
+	private double totalDiscount;
+
 }

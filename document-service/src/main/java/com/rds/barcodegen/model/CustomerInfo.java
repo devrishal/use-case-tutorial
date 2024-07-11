@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerInfo {
-    private String name;
 
-    private String id;
+	private String name;
 
-    private String address;
+	private String id;
+
+	private String address;
+
 }

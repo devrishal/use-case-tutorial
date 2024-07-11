@@ -16,12 +16,17 @@
 	<description>Code39 Barcode generator</description>
 
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 		<barcode4j.version>2.1</barcode4j.version>
 		<avalon-framework-api.version>4.3.1</avalon-framework-api.version>
-		<fop.version>2.7</fop.version>
+		<fop.version>2.9</fop.version>
 		<springdoc-openapi-ui.version>2.3.0</springdoc-openapi-ui.version>
 		<saxon-he.version>11.4</saxon-he.version>
+		<spring-java-format.version>0.0.42</spring-java-format.version>
+		<spring-plugin-core.version>3.0.0</spring-plugin-core.version>
+		<poi-ooxml.version>5.3.0</poi-ooxml.version>
+		<poi.version>5.3.0</poi.version>
+		<modelmapper.version>3.2.0</modelmapper.version>
 	</properties>
 
 	<dependencies>
@@ -45,6 +50,34 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ojdbc11</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.plugin</groupId>
+			<artifactId>spring-plugin-core</artifactId>
+			<version>${spring-plugin-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi-ooxml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${poi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>${modelmapper.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -106,6 +139,20 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.spring.javaformat</groupId>
+				<artifactId>spring-javaformat-maven-plugin</artifactId>
+				<version>${spring-java-format.version}</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<inherited>true</inherited>
+						<goals>
+							<goal>validate</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
