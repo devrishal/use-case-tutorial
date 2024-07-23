@@ -21,11 +21,9 @@ public class CustomerXlsDocumentService {
 	private final ModelMapper modelMapper;
 
 	public void generateXlsDocument(String docName, HttpServletResponse response) {
-		List<CustomerData> customers = customerRepository.findAll()
-			.stream()
-			.map(customer -> modelMapper.map(customer, CustomerData.class))
-			.toList();
-		documentWriter.write(customers, docName, response);
+		List<CustomerData> customers = customerRepository.findAll().stream()
+				.map(customer -> modelMapper.map(customer, CustomerData.class)).toList();
+		documentWriter.write(customers, docName, CustomerData.class, response);
 	}
 
 }

@@ -28,18 +28,4 @@ public interface DocumentResource {
 	void downloadBill(@RequestBody OrderDetail orderDetail, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException;
 
-	@DocumentResponse
-	@Operation(summary = "Download XLS document")
-	@GetMapping(path = "/documents/generic")
-	void downloadXlsGenericDocument(
-			@RequestParam @Parameter(description = "Document Name", example = "TestDocument") String docName,
-			HttpServletRequest request, HttpServletResponse response);
-
-	@DocumentResponse
-	@Operation(summary = "Download XLS document")
-	@GetMapping(path = "/documents")
-	void downloadXlsDocument(
-			@RequestParam @Parameter(description = "Document Name", example = "TestDocument") String docName,
-			HttpServletRequest request, HttpServletResponse response);
-
 }

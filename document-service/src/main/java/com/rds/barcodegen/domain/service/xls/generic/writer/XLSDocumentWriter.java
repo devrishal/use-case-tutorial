@@ -7,9 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import com.rds.barcodegen.domain.service.xls.generic.strategy.impl.XLSCellDataType;
 import com.rds.barcodegen.domain.service.xls.generic.XLSColumn;
 import com.rds.barcodegen.domain.service.xls.generic.strategy.XlsCellValueStrategyService;
+import com.rds.barcodegen.domain.service.xls.generic.strategy.impl.XLSCellDataType;
 import com.rds.barcodegen.exception.DocumentServiceException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,17 +33,21 @@ public class XLSDocumentWriter<T> {
 
 	private final PluginRegistry<XlsCellValueStrategyService, XLSCellDataType> cellStrategyPluginRegistry;
 
-	void write(List<T> data, String sheetName, HttpServletResponse response) {
+	void write(List<T> data, String sheetName, Class<T> clazz, HttpServletResponse response) {
+
+		response.setContentType("application/vnd.ms-excel");
+		response.setStatus(OK.value());
+		response.setHeader(CONTENT_DISPOSITION, "attachment;filename=" + sheetName + ".xlsx");
+
+		if (isEmpty(data)) {
+			throw new DocumentServiceException("No data to generate document");
+		}
+
+		Field[] fields = getSortedFields(clazz);
 		try (var workbook = new XSSFWorkbook()) {
-			response.setContentType("application/vnd.ms-excel");
-			response.setStatus(OK.value());
-			response.setHeader(CONTENT_DISPOSITION, "attachment;filename=" + sheetName + ".xlsx");
 			Sheet sheet = workbook.createSheet(sheetName);
-			if (isEmpty(data)) {
-				throw new DocumentServiceException("No data to generate document");
-			}
-			createHeaderRow(sheet, data.get(0).getClass());
-			createDataRows(sheet, data, workbook);
+			createHeaderRow(sheet, fields);
+			createDataRows(sheet, data, fields, workbook);
 			workbook.write(response.getOutputStream());
 		}
 		catch (IOException | IllegalAccessException e) {
@@ -51,9 +55,8 @@ public class XLSDocumentWriter<T> {
 		}
 	}
 
-	private void createHeaderRow(Sheet sheet, Class<?> aClass) {
+	private void createHeaderRow(Sheet sheet, Field[] fields) {
 		Row headerRow = sheet.createRow(0);
-		Field[] fields = getSortedFields(aClass);
 		for (Field field : fields) {
 			if (field.isAnnotationPresent(XLSColumn.class)) {
 				XLSColumn column = field.getAnnotation(XLSColumn.class);
@@ -62,11 +65,11 @@ public class XLSDocumentWriter<T> {
 		}
 	}
 
-	private void createDataRows(Sheet sheet, List<T> data, Workbook workbook) throws IllegalAccessException {
+	private void createDataRows(Sheet sheet, List<T> data, Field[] fields, Workbook workbook)
+			throws IllegalAccessException {
 		int rowIndex = 1;
 		for (T item : data) {
 			Row row = sheet.createRow(rowIndex++);
-			Field[] fields = getSortedFields(item.getClass());
 			for (Field field : fields) {
 				ReflectionUtils.makeAccessible(field);
 				Object value = field.get(item);
@@ -79,10 +82,9 @@ public class XLSDocumentWriter<T> {
 	}
 
 	private Field[] getSortedFields(Class<?> clazz) {
-		return Arrays.stream(clazz.getDeclaredFields())
-			.filter(field -> field.isAnnotationPresent(XLSColumn.class))
-			.sorted(Comparator.comparing(field -> field.getAnnotation(XLSColumn.class).columnIndex()))
-			.toArray(Field[]::new);
+		return Arrays.stream(clazz.getDeclaredFields()).filter(field -> field.isAnnotationPresent(XLSColumn.class))
+				.sorted(Comparator.comparing(field -> field.getAnnotation(XLSColumn.class).columnIndex()))
+				.toArray(Field[]::new);
 	}
 
 	private void setCellValue(Cell cell, Field field, Object value, XLSColumn column, Workbook workbook) {
@@ -92,7 +94,7 @@ public class XLSDocumentWriter<T> {
 		}
 		XLSCellDataType xlsCellDataType = XLSCellDataType.fromValue(field.getType().getSimpleName());
 		Optional<XlsCellValueStrategyService> cellValueStrategyService = cellStrategyPluginRegistry
-			.getPluginFor(xlsCellDataType);
+				.getPluginFor(xlsCellDataType);
 		cellValueStrategyService.ifPresent(i -> i.setCellValue(cell, value, column, workbook));
 	}
 

@@ -33,18 +33,21 @@ public class CustomerXLSUsualDocumentService {
 	private final ModelMapper modelMapper;
 
 	public void generateXlsDocument(String docName, HttpServletResponse response) {
+        response.setContentType("application/vnd.ms-excel");
+        response.setStatus(OK.value());
+        response.setHeader(CONTENT_DISPOSITION, "attachment;filename=" + docName + ".xlsx");
+
 		List<CustomerData> data = customerRepository.findAll()
 			.stream()
 			.map(customer -> modelMapper.map(customer, CustomerData.class))
 			.toList();
+
+        if (isEmpty(data)) {
+            throw new DocumentServiceException("No data to generate document");
+        }
+
 		try (var workbook = new XSSFWorkbook()) {
-			response.setContentType("application/vnd.ms-excel");
-			response.setStatus(OK.value());
-			response.setHeader(CONTENT_DISPOSITION, "attachment;filename=" + docName + ".xlsx");
 			Sheet sheet = workbook.createSheet(docName);
-			if (isEmpty(data)) {
-				throw new DocumentServiceException("No data to generate document");
-			}
 			createHeaderRow(sheet);
 			createDataRows(sheet, data);
 			workbook.write(response.getOutputStream());
