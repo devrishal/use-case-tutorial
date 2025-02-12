@@ -1,5 +1,7 @@
 package com.dev.jpa.spec.jpaspecification.model;
 
+import java.util.List;
+
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
@@ -25,6 +27,15 @@ public enum Operator {
             Expression<String> expression = criteriaAttributeBuilder.build(root, query, cb);
             Predicate predicate = cb.equal(expression, searchValue);
             return cb.and(predicate);
+        }
+    },
+    IN {
+        @Override
+        public Predicate buildCriteria(Root root, CriteriaQuery query, CriteriaBuilder cb,
+                String searchKey, String searchValue) {
+            CriteriaAttributeBuilder criteriaAttributeBuilder = CriteriaAttributeBuilder.valueOf(searchKey);
+            List<String> inSearchParams = List.of(searchValue.split(","));
+            return criteriaAttributeBuilder.build(root, query, cb).in(inSearchParams);
         }
     };
 
