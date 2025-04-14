@@ -24,7 +24,7 @@
 		<saxon-he.version>11.4</saxon-he.version>
 		<spring-java-format.version>0.0.42</spring-java-format.version>
 		<spring-plugin-core.version>3.0.0</spring-plugin-core.version>
-		<poi-ooxml.version>5.3.0</poi-ooxml.version>
+		<poi-ooxml.version>5.4.0</poi-ooxml.version>
 		<poi.version>5.3.0</poi.version>
 		<modelmapper.version>3.2.0</modelmapper.version>
 	</properties>
